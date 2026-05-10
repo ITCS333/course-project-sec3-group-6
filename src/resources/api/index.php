@@ -128,6 +128,8 @@ $sql = "SELECT id, title, description, link, created_at FROM resources";
     // TODO: Check if search parameter exists in $_GET
     // If yes, add WHERE clause using LIKE to search title and description
     // Use OR to search both fields
+   $search = $_GET['search'] ?? null;
+    
     if ($search) {
     $sql .= " WHERE title LIKE :search OR description LIKE :search";
 }
@@ -195,7 +197,7 @@ if ($resource) {
 } else {
     sendResponse(['success' => false, 'message' => 'Resource not found.'], 404);
 }
-
+}
 
 /**
  * Function: Create a new resource
@@ -586,7 +588,13 @@ function validateUrl($url) {
 function sanitizeInput($data) {
     // TODO: trim() → strip_tags() → htmlspecialchars(ENT_QUOTES, 'UTF-8')
     // Return the sanitized string
-    return filter_var($url, FILTER_VALIDATE_URL) !== false;
+   return htmlspecialchars(
+        strip_tags(
+            trim($data)
+        ),
+        ENT_QUOTES,
+        'UTF-8'
+    );
 }
 
 
