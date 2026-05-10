@@ -194,7 +194,7 @@ async function handleAddResource(event) {
  * 7. Call `renderTable()` and reset the form back to "Add" mode,
  *    restoring the submit button text to "Add Resource".
  */
-function handleTableClick(event) {
+async function handleTableClick(event) {
   // ... your implementation here ...
    if (event.target.classList.contains('delete-btn')) {
 
