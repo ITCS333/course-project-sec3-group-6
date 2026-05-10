@@ -12,9 +12,7 @@ class Database {
         try {
 
             $conn = new PDO(
-                "mysql:host=" . $this->host .
-                ";dbname=" . $this->db_name .
-                ";charset=utf8",
+                "mysql:host={$this->host};dbname={$this->db_name};charset=utf8",
                 $this->username,
                 $this->password
             );
@@ -26,12 +24,16 @@ class Database {
 
             return $conn;
 
-        } catch (PDOException $exception) {
+        } catch (PDOException $e) {
 
-            die(
-                "Database connection error: " .
-                $exception->getMessage()
-            );
+            http_response_code(500);
+
+            echo json_encode([
+                'success' => false,
+                'message' => 'Database connection failed.'
+            ]);
+
+            exit;
         }
     }
 }
