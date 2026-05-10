@@ -80,7 +80,7 @@ function createCommentArticle(comment) {
   `;
 
   return article;
-}
+
 }
 
 /**
