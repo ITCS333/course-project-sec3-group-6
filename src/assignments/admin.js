@@ -20,12 +20,12 @@ function createAssignmentRow(assignment) {
 
   const editButton = document.createElement("button");
   editButton.className = "edit-btn";
-  editButton.dataset.id = assignment.id;
+  editButton.setAttribute("data-id", assignment.id);
   editButton.textContent = "Edit";
 
   const deleteButton = document.createElement("button");
   deleteButton.className = "delete-btn";
-  deleteButton.dataset.id = assignment.id;
+  deleteButton.setAttribute("data-id", assignment.id);
   deleteButton.textContent = "Delete";
 
   actionsCell.appendChild(editButton);
@@ -53,6 +53,7 @@ async function handleAddAssignment(event) {
   const title = document.getElementById("assignment-title").value.trim();
   const due_date = document.getElementById("assignment-due-date").value;
   const description = document.getElementById("assignment-description").value.trim();
+
   const files = document
     .getElementById("assignment-files")
     .value
@@ -71,7 +72,7 @@ async function handleAddAssignment(event) {
     files: files
   };
 
-  const editId = submitButton.dataset.editId;
+  const editId = submitButton.getAttribute("data-edit-id");
 
   if (editId) {
     await handleUpdateAssignment(Number(editId), fields);
@@ -138,13 +139,13 @@ async function handleUpdateAssignment(id, fields) {
     assignmentForm.reset();
 
     submitButton.textContent = "Add Assignment";
-    delete submitButton.dataset.editId;
+    submitButton.removeAttribute("data-edit-id");
   }
 }
 
 async function handleTableClick(event) {
   if (event.target.classList.contains("delete-btn")) {
-    const id = Number(event.target.dataset.id);
+    const id = Number(event.target.getAttribute("data-id"));
 
     const response = await fetch(`./api/index.php?id=${id}`, {
       method: "DELETE"
@@ -162,7 +163,7 @@ async function handleTableClick(event) {
   }
 
   if (event.target.classList.contains("edit-btn")) {
-    const id = Number(event.target.dataset.id);
+    const id = Number(event.target.getAttribute("data-id"));
 
     const assignment = assignments.find(function (item) {
       return Number(item.id) === id;
@@ -178,7 +179,7 @@ async function handleTableClick(event) {
     document.getElementById("assignment-files").value = assignment.files.join("\n");
 
     submitButton.textContent = "Update Assignment";
-    submitButton.dataset.editId = assignment.id;
+    submitButton.setAttribute("data-edit-id", assignment.id);
   }
 }
 
