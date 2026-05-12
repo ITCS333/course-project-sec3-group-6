@@ -1,12 +1,6 @@
-/*
-  Requirement: Populate the assignment detail page and discussion forum.
-*/
-
-// --- Global Data Store ---
 let currentAssignmentId = null;
 let currentComments = [];
 
-// --- Element Selections ---
 const assignmentTitle = document.getElementById("assignment-title");
 const assignmentDueDate = document.getElementById("assignment-due-date");
 const assignmentDescription = document.getElementById("assignment-description");
@@ -15,8 +9,6 @@ const commentList = document.getElementById("comment-list");
 const commentForm = document.getElementById("comment-form");
 const newCommentInput = document.getElementById("new-comment");
 
-// --- Functions ---
-
 function getAssignmentIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
@@ -24,16 +16,14 @@ function getAssignmentIdFromURL() {
 
 function renderAssignmentDetails(assignment) {
   assignmentTitle.textContent = assignment.title;
-
-  assignmentDueDate.textContent =
-    "Due: " + assignment.due_date;
-
-  assignmentDescription.textContent =
-    assignment.description;
+  assignmentDueDate.textContent = "Due: " + assignment.due_date;
+  assignmentDescription.textContent = assignment.description;
 
   assignmentFilesList.innerHTML = "";
 
-  assignment.files.forEach(function (url) {
+  const files = Array.isArray(assignment.files) ? assignment.files : [];
+
+  files.forEach(function (url) {
     const li = document.createElement("li");
 
     const link = document.createElement("a");
@@ -78,28 +68,23 @@ async function handleAddComment(event) {
     return;
   }
 
-  const response = await fetch(
-    "./api/index.php?action=comment",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        assignment_id: Number(currentAssignmentId),
-        author: "Student",
-        text: commentText
-      })
-    }
-  );
+  const response = await fetch("./api/index.php?action=comment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      assignment_id: Number(currentAssignmentId),
+      author: "Student",
+      text: commentText
+    })
+  });
 
   const result = await response.json();
 
   if (result.success === true) {
     currentComments.push(result.data);
-
     renderComments();
-
     newCommentInput.value = "";
   }
 }
@@ -112,13 +97,10 @@ async function initializePage() {
     return;
   }
 
-  const [assignmentResponse, commentsResponse] =
-    await Promise.all([
-      fetch(`./api/index.php?id=${currentAssignmentId}`),
-      fetch(
-        `./api/index.php?action=comments&assignment_id=${currentAssignmentId}`
-      )
-    ]);
+  const [assignmentResponse, commentsResponse] = await Promise.all([
+    fetch(`./api/index.php?id=${currentAssignmentId}`),
+    fetch(`./api/index.php?action=comments&assignment_id=${currentAssignmentId}`)
+  ]);
 
   const assignmentResult = await assignmentResponse.json();
   const commentsResult = await commentsResponse.json();
@@ -127,18 +109,11 @@ async function initializePage() {
 
   if (assignmentResult.success === true) {
     renderAssignmentDetails(assignmentResult.data);
-
     renderComments();
-
-    commentForm.addEventListener(
-      "submit",
-      handleAddComment
-    );
+    commentForm.addEventListener("submit", handleAddComment);
   } else {
-    assignmentTitle.textContent =
-      "Assignment not found.";
+    assignmentTitle.textContent = "Assignment not found.";
   }
 }
 
-// --- Initial Page Load ---
 initializePage();
