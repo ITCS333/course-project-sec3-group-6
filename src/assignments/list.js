@@ -1,7 +1,3 @@
-/*
-  Requirement: Populate the "Course Assignments" list page.
-*/
-
 const assignmentListSection = document.getElementById("assignment-list-section");
 
 function createAssignmentArticle(assignment) {
@@ -18,7 +14,7 @@ function createAssignmentArticle(assignment) {
 
   const link = document.createElement("a");
   link.href = `details.html?id=${assignment.id}`;
-  link.textContent = "View Details & Discussion";
+  link.innerHTML = "View Details &amp; Discussion";
 
   article.appendChild(title);
   article.appendChild(dueDate);
@@ -30,6 +26,11 @@ function createAssignmentArticle(assignment) {
 
 async function loadAssignments() {
   const response = await fetch("./api/index.php");
+
+  if (!response.ok) {
+    return;
+  }
+
   const result = await response.json();
 
   assignmentListSection.innerHTML = "";
