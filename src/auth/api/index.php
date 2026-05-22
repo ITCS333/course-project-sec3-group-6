@@ -26,6 +26,14 @@ header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+function respond($success, $message, $extra = [], $code = 200) {
+    http_response_code($code);
+    echo json_encode(array_merge([
+        "success" => $success,
+        "message" => $message
+    ], $extra));
+    exit();
+}
 
 
 // --- Check Request Method ---
@@ -41,6 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ]);
 
     exit();
+}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    respond(false, "Invalid request method. POST required.", [], 405);
 }
 
 
@@ -69,6 +80,9 @@ if (!isset($data['email']) || !isset($data['password'])) {
 
     exit();
 }
+if (!isset($data['email']) || !isset($data['password'])) {
+    respond(false, "Email and password are required.", [], 400);
+}
 
 
 
@@ -92,6 +106,10 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
     exit();
 }
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    respond(false, "Invalid email format.", [], 400);
+}
+
 
 
 // TODO: Validate the password length (minimum 8 characters)
@@ -105,6 +123,9 @@ if (strlen($password) < 8) {
     ]);
 
     exit();
+}
+if (strlen($password) < 8) {
+    respond(false, "Password must be at least 8 characters.", [], 400);
 }
 
 
@@ -263,6 +284,44 @@ $_SESSION['logged_in'] = true;
         "is_admin" => $user['is_admin']
     ]
 ];
+try {
+
+    $pdo = getDBConnection();
+
+    $sql = "SELECT id, name, email, password, is_admin FROM users WHERE email = :email";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':email' => $email]);
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  
+    if (!$user || !password_verify($password, $user['password'])) {
+        respond(false, "Invalid email or password", [], 401);
+    }
+
+   
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user_name'] = $user['name'];
+    $_SESSION['user_email'] = $user['email'];
+    $_SESSION['is_admin'] = $user['is_admin'];
+    $_SESSION['logged_in'] = true;
+
+    
+    respond(true, "Login successful", [
+        "user" => [
+            "id" => $user['id'],
+            "name" => $user['name'],
+            "email" => $user['email'],
+            "is_admin" => $user['is_admin']
+        ]
+    ]);
+
+} catch (PDOException $e) {
+
+    error_log("DB error: " . $e->getMessage());
+
+    respond(false, "Something went wrong. Please try again later.", [], 500);
+}
 
 
         // TODO: Encode the response array as JSON and echo it
