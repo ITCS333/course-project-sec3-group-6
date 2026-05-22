@@ -129,55 +129,23 @@ async function handleChangePassword(event) {
   // ... your implementation here ...
   event.preventDefault();
 
-    const currentPasswordInput = document.querySelector("#current-password");
-    const newPasswordInput = document.querySelector("#new-password");
-    const confirmPasswordInput = document.querySelector("#confirm-password");
+  const currentPassword = document.getElementById("current-password");
+  const newPassword = document.getElementById("new-password");
+  const confirmPassword = document.getElementById("confirm-password");
 
-    const current_password = currentPasswordInput.value;
-    const new_password = newPasswordInput.value;
-    const confirm_password = confirmPasswordInput.value;
+  if (newPassword.value !== confirmPassword.value) {
+    alert("Passwords do not match.");
+    return;
+  }
 
-    if (new_password !== confirm_password) {
-        alert("Passwords do not match.");
-        return;
-    }
+  if (newPassword.value.length < 8) {
+    alert("Password must be at least 8 characters.");
+    return;
+  }
 
-    if (new_password.length < 8) {
-        alert("Password must be at least 8 characters.");
-        return;
-    }
-
-    try {
-        const response = await fetch("../api/index.php?action=change_password", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                id: currentUserId,
-                current_password,
-                new_password
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            alert(data.error || "An error occurred.");
-            return;
-        }
-
-        
-        alert("Password updated successfully!");
-
-        currentPasswordInput.value = "";
-        newPasswordInput.value = "";
-        confirmPasswordInput.value = "";
-
-    } catch (error) {
-        console.error(error);
-        alert("Network error. Please try again.");
-    }
+  currentPassword.value = "";
+  newPassword.value = "";
+  confirmPassword.value = "";
 }
 
 /**
