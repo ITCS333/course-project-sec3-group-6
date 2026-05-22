@@ -33,6 +33,9 @@ const searchInput = document.querySelector("#search-input");
 // TODO: Select all table header (th) elements inside the thead of id="user-table".
 const tableHeaders = document.querySelectorAll("#user-table thead th");
 
+let currentUserId = null;
+let sortAsc = true;
+
 // --- Functions ---
 
 /**
@@ -178,6 +181,9 @@ async function handleChangePassword(event) {
         alert("Network error. Please try again.");
         console.error(error);
     }
+document.getElementById("current-password").value = "";
+document.getElementById("new-password").value = "";
+document.getElementById("confirm-password").value = "";
 }
 
 /**
@@ -417,44 +423,52 @@ function handleSearch(event) {
  */
 function handleSort(event) {
   // ... your implementation here ...
-   const th = event.currentTarget;
-
-   
+ const th = event.currentTarget;
     const index = th.cellIndex;
 
-    
-    const map = {
-        0: "name",
-        1: "email",
-        2: "is_admin"
-    };
 
-    const key = map[index];
-    if (!key) return;
+    let key;
+    if (index === 0) key = "name";
+    else if (index === 1) key = "email";
+    else if (index === 2) key = "is_admin";
+
+    let dir = th.getAttribute("data-sort-dir");
+
+    if (!dir) {
+        dir = "asc";
+    }
 
     
-    let direction = th.dataset.sortDir || "asc";
-    direction = direction === "asc" ? "desc" : "asc";
-    th.dataset.sortDir = direction;
+    dir = dir === "asc" ? "desc" : "asc";
+
+    // Save back to attribute
+    th.setAttribute("data-sort-dir", dir);
 
     
     users.sort((a, b) => {
         let valA = a[key];
         let valB = b[key];
 
-        let comparison = 0;
-
         if (key === "is_admin") {
-            comparison = Number(valA) - Number(valB);
+            valA = Number(valA);
+            valB = Number(valB);
         } else {
-            comparison = String(valA).localeCompare(String(valB));
+            valA = String(valA);
+            valB = String(valB);
         }
 
-        
-        return direction === "asc" ? comparison : -comparison;
+        let result;
+
+        if (key === "is_admin") {
+            result = valA - valB;
+        } else {
+            result = valA.localeCompare(valB);
+        }
+
+        return dir === "asc" ? result : -result;
     });
 
-    
+
     renderTable(users);
 }
 
