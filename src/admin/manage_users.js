@@ -33,7 +33,7 @@ const searchInput = document.querySelector("#search-input");
 // TODO: Select all table header (th) elements inside the thead of id="user-table".
 const tableHeaders = document.querySelectorAll("#user-table thead th");
 
-let currentUserId = null;
+let currentUserId = 1; 
 let sortAsc = true;
 
 // --- Functions ---
@@ -173,17 +173,14 @@ async function handleChangePassword(event) {
 
         alert("Password updated successfully!");
 
-        currentPasswordInput.value = "";
-        newPasswordInput.value = "";
-        confirmPasswordInput.value = "";
+currentPasswordInput.value = "";
+newPasswordInput.value = "";
+confirmPasswordInput.value = "";
 
     } catch (error) {
         alert("Network error. Please try again.");
         console.error(error);
     }
-document.getElementById("current-password").value = "";
-document.getElementById("new-password").value = "";
-document.getElementById("confirm-password").value = "";
 }
 
 /**
@@ -423,28 +420,21 @@ function handleSearch(event) {
  */
 function handleSort(event) {
   // ... your implementation here ...
- const th = event.currentTarget;
+    const th = event.currentTarget;
     const index = th.cellIndex;
-
 
     let key;
     if (index === 0) key = "name";
     else if (index === 1) key = "email";
     else if (index === 2) key = "is_admin";
 
+    // correct default behavior
     let dir = th.getAttribute("data-sort-dir");
 
     if (!dir) {
         dir = "asc";
     }
 
-    
-    dir = dir === "asc" ? "desc" : "asc";
-
-    // Save back to attribute
-    th.setAttribute("data-sort-dir", dir);
-
-    
     users.sort((a, b) => {
         let valA = a[key];
         let valB = b[key];
@@ -452,9 +442,6 @@ function handleSort(event) {
         if (key === "is_admin") {
             valA = Number(valA);
             valB = Number(valB);
-        } else {
-            valA = String(valA);
-            valB = String(valB);
         }
 
         let result;
@@ -462,12 +449,14 @@ function handleSort(event) {
         if (key === "is_admin") {
             result = valA - valB;
         } else {
-            result = valA.localeCompare(valB);
+            result = String(valA).localeCompare(String(valB));
         }
 
         return dir === "asc" ? result : -result;
     });
 
+   
+    th.setAttribute("data-sort-dir", dir === "asc" ? "desc" : "asc");
 
     renderTable(users);
 }
@@ -506,7 +495,7 @@ async function loadUsersAndInitialize() {
         const result = await response.json();
 
        
-        users = result.data || [];
+       users = Array.isArray(result.data) ? result.data : [];
 
        
         renderTable(users);
