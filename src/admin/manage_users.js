@@ -171,16 +171,17 @@ async function handleChangePassword(event) {
             return;
         }
 
-        alert("Password updated successfully!");
-
-currentPasswordInput.value = "";
-newPasswordInput.value = "";
-confirmPasswordInput.value = "";
 
     } catch (error) {
         alert("Network error. Please try again.");
         console.error(error);
     }
+
+    alert("Password updated successfully!");
+
+currentPasswordInput.value = "";
+newPasswordInput.value = "";
+confirmPasswordInput.value = "";
 }
 
 /**
