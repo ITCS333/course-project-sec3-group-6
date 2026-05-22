@@ -127,9 +127,8 @@ function renderTable(userArray) {
  */
 async function handleChangePassword(event) {
   // ... your implementation here ...
-   event.preventDefault();
+  event.preventDefault();
 
-    
     const currentPasswordInput = document.querySelector("#current-password");
     const newPasswordInput = document.querySelector("#new-password");
     const confirmPasswordInput = document.querySelector("#confirm-password");
@@ -138,7 +137,6 @@ async function handleChangePassword(event) {
     const new_password = newPasswordInput.value;
     const confirm_password = confirmPasswordInput.value;
 
-    
     if (new_password !== confirm_password) {
         alert("Passwords do not match.");
         return;
@@ -150,14 +148,13 @@ async function handleChangePassword(event) {
     }
 
     try {
-       
         const response = await fetch("../api/index.php?action=change_password", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                id: currentUserId, 
+                id: currentUserId,
                 current_password,
                 new_password
             })
@@ -165,23 +162,22 @@ async function handleChangePassword(event) {
 
         const data = await response.json();
 
-        
         if (!response.ok) {
             alert(data.error || "An error occurred.");
             return;
         }
 
+        
+        alert("Password updated successfully!");
+
+        currentPasswordInput.value = "";
+        newPasswordInput.value = "";
+        confirmPasswordInput.value = "";
 
     } catch (error) {
-        alert("Network error. Please try again.");
         console.error(error);
+        alert("Network error. Please try again.");
     }
-
-    alert("Password updated successfully!");
-
-currentPasswordInput.value = "";
-newPasswordInput.value = "";
-confirmPasswordInput.value = "";
 }
 
 /**
