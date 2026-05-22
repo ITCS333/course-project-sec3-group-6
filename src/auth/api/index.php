@@ -152,6 +152,7 @@ try {
 
         exit;
     }
+}
 
 
     // --- Prepare SQL Query ---
