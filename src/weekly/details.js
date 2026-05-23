@@ -102,4 +102,88 @@ async function handleAddComment(event) {
       method: 'POST',
 
       headers: {
-        'Content-Type':
+        'Content-Type': 'application/json'
+      },
+
+      body: JSON.stringify({
+        week_id: currentWeekId,
+        author: 'Student',
+        text: commentText
+      })
+
+    });
+
+    const result = await response.json();
+
+    if (result.success === true) {
+
+      currentComments.push(result.data);
+
+      renderComments();
+
+      newCommentInput.value = '';
+
+    }
+
+  } catch (error) {
+
+    console.error('Error adding comment:', error);
+
+  }
+
+}
+
+async function initializePage() {
+
+  currentWeekId = getWeekIdFromURL();
+
+  if (!currentWeekId) {
+
+    weekTitle.textContent = 'Week not found.';
+
+    return;
+
+  }
+
+  try {
+
+    const [weekResponse, commentsResponse] = await Promise.all([
+
+      fetch(`./api/index.php?id=${currentWeekId}`),
+
+      fetch(`./api/index.php?action=comments&week_id=${currentWeekId}`)
+
+    ]);
+
+    const weekResult = await weekResponse.json();
+
+    const commentsResult = await commentsResponse.json();
+
+    currentComments = commentsResult.data || [];
+
+    if (weekResult.success && weekResult.data) {
+
+      renderWeekDetails(weekResult.data);
+
+      renderComments();
+
+      commentForm.addEventListener('submit', handleAddComment);
+
+    } else {
+
+      weekTitle.textContent = 'Week not found.';
+
+    }
+
+  } catch (error) {
+
+    console.error('Error loading page:', error);
+
+    weekTitle.textContent = 'Error loading page.';
+
+  }
+
+}
+
+// --- Initial Page Load ---
+initializePage();
