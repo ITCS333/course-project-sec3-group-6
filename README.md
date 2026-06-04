@@ -13,7 +13,7 @@ The website covers five functional areas, each assigned to one team member.
 
 ## Live Demo
 
-> **Replit Deployment:[** Update this link with your Replit deployment URL once the project is live.](https://replit.com/@sumayafaraj05/course-project-sec3-group-6)
+> **Replit Deployment:** https://9746926b-2264-43b9-8269-b8e59a852fa0-00-1hd3ui7t2myj9.sisko.replit.dev/ 
 
 ---
 
